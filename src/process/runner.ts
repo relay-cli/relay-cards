@@ -18,6 +18,7 @@ export interface RunningCommand {
   child: ChildProcessWithoutNullStreams;
   completion: Promise<CommandResult>;
   displayCommand: string;
+  stop: (signal?: NodeJS.Signals) => boolean;
 }
 
 const quoteArgument = (value: string): string =>
@@ -105,5 +106,13 @@ export const runCommand = (
     });
   });
 
-  return {child, completion, displayCommand};
+  const stop = (signal: NodeJS.Signals = 'SIGTERM'): boolean => {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      return false;
+    }
+    options.onEvent(processEvent('stopping', displayCommand, {signal}));
+    return child.kill(signal);
+  };
+
+  return {child, completion, displayCommand, stop};
 };

@@ -1,8 +1,10 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Box, Text, useInput} from 'ink';
 import type {EventStore} from '../store/index.js';
+import type {RelayEventKind} from '../events/index.js';
 import {theme} from '../ui/index.js';
 import {CardFeed} from './CardFeed.js';
+import {allEventKinds, filterEvents} from './filter-events.js';
 import {useEventStore} from './useEventStore.js';
 
 export interface RelayCardsAppProps {
@@ -16,20 +18,61 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [following, setFollowing] = useState(true);
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
+  const [enabledKinds, setEnabledKinds] = useState<ReadonlySet<RelayEventKind>>(
+    new Set(allEventKinds),
+  );
+  const [query, setQuery] = useState('');
+  const [searching, setSearching] = useState(false);
+  const filteredEvents = useMemo(
+    () => filterEvents(events, enabledKinds, query),
+    [enabledKinds, events, query],
+  );
 
   useEffect(() => {
     if (following) {
-      setSelectedIndex(Math.max(0, events.length - 1));
+      setSelectedIndex(Math.max(0, filteredEvents.length - 1));
     } else {
-      setSelectedIndex((current) => Math.min(current, Math.max(0, events.length - 1)));
+      setSelectedIndex((current) => Math.min(current, Math.max(0, filteredEvents.length - 1)));
     }
-  }, [events.length, following]);
+  }, [filteredEvents.length, following]);
 
   useInput((input, key) => {
+    if (searching) {
+      if (key.escape || key.return) {
+        setSearching(false);
+      } else if (key.backspace || key.delete) {
+        setQuery((current) => current.slice(0, -1));
+      } else if (!key.ctrl && !key.meta && input.length === 1) {
+        setQuery((current) => current + input);
+      }
+      return;
+    }
+    if (input === '/') {
+      setSearching(true);
+      return;
+    }
+    const kindByNumber: Record<string, RelayEventKind> = {
+      '1': 'http',
+      '2': 'json',
+      '3': 'error',
+      '4': 'warning',
+      '5': 'process',
+      '6': 'text',
+    };
+    const kind = kindByNumber[input];
+    if (kind !== undefined) {
+      setEnabledKinds((current) => {
+        const next = new Set(current);
+        if (next.has(kind)) next.delete(kind);
+        else next.add(kind);
+        return next;
+      });
+      return;
+    }
     if (input === 'j' || key.downArrow) {
       setSelectedIndex((current) => {
-        const next = Math.min(events.length - 1, current + 1);
-        setFollowing(next === events.length - 1);
+        const next = Math.min(filteredEvents.length - 1, current + 1);
+        setFollowing(next === filteredEvents.length - 1);
         return Math.max(0, next);
       });
     }
@@ -43,10 +86,10 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
     }
     if (input === 'G') {
       setFollowing(true);
-      setSelectedIndex(Math.max(0, events.length - 1));
+      setSelectedIndex(Math.max(0, filteredEvents.length - 1));
     }
     if (key.return || input === ' ') {
-      const selected = events[selectedIndex];
+      const selected = filteredEvents[selectedIndex];
       if (selected === undefined) return;
       setExpandedIds((current) => {
         const next = new Set(current);
@@ -67,15 +110,20 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
       </Box>
       <Box flexDirection="column" paddingY={1}>
         <CardFeed
-          events={events}
+          events={filteredEvents}
           selectedIndex={selectedIndex}
           expandedIds={expandedIds}
           {...(visibleCount === undefined ? {} : {visibleCount})}
         />
       </Box>
       <Text color={theme.muted}>
-        {events.length} events · ↑/↓ move · enter expand · G follow · ? help
+        {filteredEvents.length}/{events.length} events · 1–6 types · / search · ↑/↓ move · enter expand
       </Text>
+      {(searching || query !== '') && (
+        <Text color={searching ? theme.blue : theme.muted}>
+          search: {query || 'type to filter…'}
+        </Text>
+      )}
     </Box>
   );
 };

@@ -5,6 +5,7 @@ import type {RelayEventKind} from '../events/index.js';
 import {theme} from '../ui/index.js';
 import {CardFeed} from './CardFeed.js';
 import {allEventKinds, filterEvents} from './filter-events.js';
+import {RawFeed} from './RawFeed.js';
 import {useEventStore} from './useEventStore.js';
 
 export interface RelayCardsAppProps {
@@ -23,6 +24,7 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
   );
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [rawMode, setRawMode] = useState(false);
   const filteredEvents = useMemo(
     () => filterEvents(events, enabledKinds, query),
     [enabledKinds, events, query],
@@ -49,6 +51,10 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
     }
     if (input === '/') {
       setSearching(true);
+      return;
+    }
+    if (input === 'r') {
+      setRawMode((current) => !current);
       return;
     }
     const kindByNumber: Record<string, RelayEventKind> = {
@@ -109,15 +115,20 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
         <Text color={theme.muted}> · {commandLabel}</Text>
       </Box>
       <Box flexDirection="column" paddingY={1}>
-        <CardFeed
-          events={filteredEvents}
-          selectedIndex={selectedIndex}
-          expandedIds={expandedIds}
-          {...(visibleCount === undefined ? {} : {visibleCount})}
-        />
+        {rawMode ? (
+          <RawFeed events={filteredEvents} visibleCount={(visibleCount ?? 5) * 3} />
+        ) : (
+          <CardFeed
+            events={filteredEvents}
+            selectedIndex={selectedIndex}
+            expandedIds={expandedIds}
+            {...(visibleCount === undefined ? {} : {visibleCount})}
+          />
+        )}
       </Box>
       <Text color={theme.muted}>
-        {filteredEvents.length}/{events.length} events · 1–6 types · / search · ↑/↓ move · enter expand
+        {filteredEvents.length}/{events.length} events · {rawMode ? 'raw' : 'cards'} · r view · 1–6
+        types · / search
       </Text>
       {(searching || query !== '') && (
         <Text color={searching ? theme.blue : theme.muted}>

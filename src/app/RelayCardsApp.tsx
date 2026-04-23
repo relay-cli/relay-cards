@@ -5,6 +5,7 @@ import type {RelayEventKind} from '../events/index.js';
 import {theme} from '../ui/index.js';
 import {CardFeed} from './CardFeed.js';
 import {allEventKinds, filterEvents} from './filter-events.js';
+import {HelpOverlay} from './HelpOverlay.js';
 import {RawFeed} from './RawFeed.js';
 import {useEventStore} from './useEventStore.js';
 
@@ -25,6 +26,7 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [rawMode, setRawMode] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const filteredEvents = useMemo(
     () => filterEvents(events, enabledKinds, query),
     [enabledKinds, events, query],
@@ -39,6 +41,10 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
   }, [filteredEvents.length, following]);
 
   useInput((input, key) => {
+    if (showHelp) {
+      if (input === '?' || input === 'q' || key.escape) setShowHelp(false);
+      return;
+    }
     if (searching) {
       if (key.escape || key.return) {
         setSearching(false);
@@ -51,6 +57,10 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
     }
     if (input === '/') {
       setSearching(true);
+      return;
+    }
+    if (input === '?') {
+      setShowHelp(true);
       return;
     }
     if (input === 'r') {
@@ -115,7 +125,9 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
         <Text color={theme.muted}> · {commandLabel}</Text>
       </Box>
       <Box flexDirection="column" paddingY={1}>
-        {rawMode ? (
+        {showHelp ? (
+          <HelpOverlay />
+        ) : rawMode ? (
           <RawFeed events={filteredEvents} visibleCount={(visibleCount ?? 5) * 3} />
         ) : (
           <CardFeed

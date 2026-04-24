@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Box, Text, useInput} from 'ink';
 import type {EventStore} from '../store/index.js';
 import type {RelayEventKind} from '../events/index.js';
+import type {RelayEvent} from '../events/index.js';
 import {theme} from '../ui/index.js';
 import {CardFeed} from './CardFeed.js';
 import {allEventKinds, filterEvents} from './filter-events.js';
@@ -13,9 +14,10 @@ export interface RelayCardsAppProps {
   store: EventStore;
   commandLabel: string;
   visibleCount?: number;
+  onQuit?: () => void;
 }
 
-export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsAppProps) => {
+export const RelayCardsApp = ({store, commandLabel, visibleCount, onQuit}: RelayCardsAppProps) => {
   const events = useEventStore(store);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [following, setFollowing] = useState(true);
@@ -27,9 +29,12 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
   const [searching, setSearching] = useState(false);
   const [rawMode, setRawMode] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [pausedEvents, setPausedEvents] = useState<readonly RelayEvent[]>([]);
+  const visibleSource = paused ? pausedEvents : events;
   const filteredEvents = useMemo(
-    () => filterEvents(events, enabledKinds, query),
-    [enabledKinds, events, query],
+    () => filterEvents(visibleSource, enabledKinds, query),
+    [enabledKinds, query, visibleSource],
   );
 
   useEffect(() => {
@@ -61,6 +66,22 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
     }
     if (input === '?') {
       setShowHelp(true);
+      return;
+    }
+    if (input === 'p') {
+      setPaused((current) => {
+        if (!current) setPausedEvents(events);
+        return !current;
+      });
+      return;
+    }
+    if (input === 'c') {
+      store.clear();
+      setPausedEvents([]);
+      return;
+    }
+    if (input === 'q') {
+      onQuit?.();
       return;
     }
     if (input === 'r') {
@@ -123,6 +144,7 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
           RELAY CARDS
         </Text>
         <Text color={theme.muted}> · {commandLabel}</Text>
+        {paused && <Text color={theme.orange}> · paused</Text>}
       </Box>
       <Box flexDirection="column" paddingY={1}>
         {showHelp ? (
@@ -139,9 +161,12 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount}: RelayCardsApp
         )}
       </Box>
       <Text color={theme.muted}>
-        {filteredEvents.length}/{events.length} events · {rawMode ? 'raw' : 'cards'} · r view · 1–6
-        types · / search
+        {filteredEvents.length}/{visibleSource.length} events · {rawMode ? 'raw' : 'cards'} · r view ·
+        p pause · c clear
       </Text>
+      {paused && events.length > pausedEvents.length && (
+        <Text color={theme.orange}>{events.length - pausedEvents.length} new events waiting</Text>
+      )}
       {(searching || query !== '') && (
         <Text color={searching ? theme.blue : theme.muted}>
           search: {query || 'type to filter…'}

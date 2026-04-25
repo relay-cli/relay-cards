@@ -7,3 +7,5 @@ export type {RelayCardsAppProps} from './RelayCardsApp.js';
 export {RawFeed} from './RawFeed.js';
 export type {RawFeedProps} from './RawFeed.js';
 export {useEventStore} from './useEventStore.js';
+export {useTerminalSize} from './useTerminalSize.js';
+export type {TerminalSize} from './useTerminalSize.js';

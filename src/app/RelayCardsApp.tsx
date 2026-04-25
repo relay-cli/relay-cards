@@ -8,6 +8,7 @@ import {CardFeed} from './CardFeed.js';
 import {allEventKinds, filterEvents} from './filter-events.js';
 import {HelpOverlay} from './HelpOverlay.js';
 import {RawFeed} from './RawFeed.js';
+import {useTerminalSize} from './useTerminalSize.js';
 import {useEventStore} from './useEventStore.js';
 
 export interface RelayCardsAppProps {
@@ -19,6 +20,9 @@ export interface RelayCardsAppProps {
 
 export const RelayCardsApp = ({store, commandLabel, visibleCount, onQuit}: RelayCardsAppProps) => {
   const events = useEventStore(store);
+  const terminal = useTerminalSize();
+  const effectiveVisibleCount =
+    visibleCount ?? Math.max(1, Math.min(7, Math.floor((terminal.rows - 7) / 5)));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [following, setFollowing] = useState(true);
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
@@ -150,13 +154,13 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount, onQuit}: Relay
         {showHelp ? (
           <HelpOverlay />
         ) : rawMode ? (
-          <RawFeed events={filteredEvents} visibleCount={(visibleCount ?? 5) * 3} />
+          <RawFeed events={filteredEvents} visibleCount={effectiveVisibleCount * 3} />
         ) : (
           <CardFeed
             events={filteredEvents}
             selectedIndex={selectedIndex}
             expandedIds={expandedIds}
-            {...(visibleCount === undefined ? {} : {visibleCount})}
+            visibleCount={effectiveVisibleCount}
           />
         )}
       </Box>

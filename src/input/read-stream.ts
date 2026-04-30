@@ -25,7 +25,9 @@ export const readEventStream = async (
     }
   };
 
-  const abort = (): void => readable.destroy(new Error('Input stream aborted.'));
+  const abort = (): void => {
+    readable.destroy(new Error('Input stream aborted.'));
+  };
   options.signal?.addEventListener('abort', abort, {once: true});
 
   try {

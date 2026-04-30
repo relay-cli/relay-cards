@@ -165,8 +165,8 @@ export const RelayCardsApp = ({store, commandLabel, visibleCount, onQuit}: Relay
         )}
       </Box>
       <Text color={theme.muted}>
-        {filteredEvents.length}/{visibleSource.length} events · {rawMode ? 'raw' : 'cards'} · r view ·
-        p pause · c clear
+        {filteredEvents.length}/{visibleSource.length} events · {rawMode ? 'raw' : 'cards'} · r view
+        · p pause · c clear
       </Text>
       {paused && events.length > pausedEvents.length && (
         <Text color={theme.orange}>{events.length - pausedEvents.length} new events waiting</Text>

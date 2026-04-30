@@ -5,7 +5,7 @@ let nextId = 0;
 export interface EventBaseInput {
   stream: EventStream;
   raw: string;
-  timestamp?: Date;
+  timestamp?: Date | undefined;
 }
 
 export const createEventBase = ({stream, raw, timestamp}: EventBaseInput): EventBase => ({

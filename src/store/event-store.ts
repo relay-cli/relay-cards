@@ -15,7 +15,8 @@ export class EventStore {
 
   constructor(options: number | EventStoreOptions = {}) {
     const limit = typeof options === 'number' ? options : (options.limit ?? 500);
-    const coalesceWithinMs = typeof options === 'number' ? 1000 : (options.coalesceWithinMs ?? 1000);
+    const coalesceWithinMs =
+      typeof options === 'number' ? 1000 : (options.coalesceWithinMs ?? 1000);
     if (!Number.isInteger(limit) || limit < 1) {
       throw new RangeError('Event history limit must be a positive integer.');
     }

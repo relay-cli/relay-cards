@@ -14,7 +14,9 @@ const run = async (): Promise<void> => {
   try {
     options = parseCliOptions(process.argv.slice(2));
   } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n\n${helpText}`);
+    process.stderr.write(
+      `${error instanceof Error ? error.message : String(error)}\n\n${helpText}`,
+    );
     process.exitCode = 2;
     return;
   }
@@ -28,7 +30,8 @@ const run = async (): Promise<void> => {
     return;
   }
 
-  const interactive = !options.plain && process.stdout.isTTY === true && process.stdin.isTTY === true;
+  const interactive =
+    !options.plain && process.stdout.isTTY === true && process.stdin.isTTY === true;
   const store = new EventStore({
     limit: options.history,
     coalesceWithinMs: options.coalesceWithinMs,

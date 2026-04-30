@@ -50,11 +50,6 @@ export interface TextEvent extends EventBase {
 }
 
 export type RelayEvent =
-  | HttpEvent
-  | JsonEvent
-  | ErrorEvent
-  | WarningEvent
-  | ProcessEvent
-  | TextEvent;
+  HttpEvent | JsonEvent | ErrorEvent | WarningEvent | ProcessEvent | TextEvent;
 
 export type RelayEventKind = RelayEvent['kind'];

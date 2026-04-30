@@ -8,10 +8,7 @@ const stackContinuationPattern = /^(?:\s+at\s+|\s*\.\.\.\s+\d+\s+more|Caused by:
 
 export const isStackContinuation = (line: string): boolean => stackContinuationPattern.test(line);
 
-export const parseErrorHeader = (
-  line: string,
-  context: ParseContext,
-): ErrorEvent | undefined => {
+export const parseErrorHeader = (line: string, context: ParseContext): ErrorEvent | undefined => {
   const errorMatch = errorHeaderPattern.exec(line);
   if (errorMatch !== null) {
     return {
@@ -36,7 +33,7 @@ export const parseErrorHeader = (
 };
 
 export class StackTraceCollector {
-  #pending?: ErrorEvent;
+  #pending: ErrorEvent | undefined;
 
   push(line: string, context: ParseContext): {events: ErrorEvent[]; consumed: boolean} {
     if (this.#pending !== undefined && isStackContinuation(line)) {

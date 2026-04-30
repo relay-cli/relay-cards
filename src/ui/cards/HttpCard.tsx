@@ -44,9 +44,7 @@ export const HttpCard = ({event, expanded = false, selected = false}: HttpCardPr
         <Text color={theme.muted}>{event.durationMs.toFixed(1)} ms</Text>
       )}
       {event.bytes !== undefined && <Text color={theme.muted}>{formatBytes(event.bytes)}</Text>}
-      {event.remoteAddress !== undefined && (
-        <Text color={theme.muted}>{event.remoteAddress}</Text>
-      )}
+      {event.remoteAddress !== undefined && <Text color={theme.muted}>{event.remoteAddress}</Text>}
     </Box>
     {expanded && (
       <Box marginTop={1}>

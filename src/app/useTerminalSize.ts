@@ -16,7 +16,9 @@ export const useTerminalSize = (): TerminalSize => {
   useEffect(() => {
     const update = (): void => setSize(readSize());
     process.stdout.on('resize', update);
-    return () => process.stdout.off('resize', update);
+    return () => {
+      process.stdout.off('resize', update);
+    };
   }, []);
 
   return size;

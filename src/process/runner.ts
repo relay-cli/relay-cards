@@ -21,10 +21,10 @@ export interface RunningCommand {
   stop: (signal?: NodeJS.Signals) => boolean;
 }
 
-const quoteArgument = (value: string): string =>
-  /\s/.test(value) ? JSON.stringify(value) : value;
+const quoteArgument = (value: string): string => (/\s/.test(value) ? JSON.stringify(value) : value);
 
-export const formatCommand = (command: readonly string[]): string => command.map(quoteArgument).join(' ');
+export const formatCommand = (command: readonly string[]): string =>
+  command.map(quoteArgument).join(' ');
 
 const processEvent = (
   state: ProcessEvent['state'],
@@ -83,7 +83,9 @@ export const runCommand = (
   });
 
   child.once('spawn', () => {
-    options.onEvent(processEvent('running', displayCommand, {pid: child.pid}));
+    options.onEvent(
+      processEvent('running', displayCommand, child.pid === undefined ? {} : {pid: child.pid}),
+    );
   });
 
   const completion = new Promise<CommandResult>((resolve) => {

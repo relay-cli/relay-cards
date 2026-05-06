@@ -53,7 +53,10 @@ export const runCommand = (
   const child = spawn(executable, args, {
     cwd: options.cwd,
     env: options.env,
-    shell: process.platform === 'win32',
+    shell:
+      process.platform === 'win32' &&
+      !executable.toLowerCase().endsWith('.exe') &&
+      !executable.toLowerCase().endsWith('.com'),
     windowsHide: true,
     stdio: ['pipe', 'pipe', 'pipe'],
   });

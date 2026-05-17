@@ -4,7 +4,25 @@
   "description": "Runs a server command and presents its requests, structured output, errors, and process events as readable terminal cards.",
   "license": "MIT",
   "type": "module",
-  "private": true,
+  "private": false,
+  "keywords": [
+    "cli",
+    "ink",
+    "logging",
+    "react",
+    "terminal-ui"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/relay-cli/server-cards.git"
+  },
+  "bugs": {
+    "url": "https://github.com/relay-cli/server-cards/issues"
+  },
+  "homepage": "https://github.com/relay-cli/server-cards#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   },

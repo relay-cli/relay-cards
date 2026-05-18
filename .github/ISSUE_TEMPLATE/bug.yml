@@ -1,0 +1,30 @@
+name: Bug report
+description: Report incorrect parsing, rendering, or process behavior.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Include the command and the smallest output sample that reproduces the problem.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Relay Cards version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system, terminal, and Node.js version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true

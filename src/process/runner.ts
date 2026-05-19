@@ -2,6 +2,7 @@ import {spawn, type ChildProcessWithoutNullStreams} from 'node:child_process';
 import {createEventBase, type ProcessEvent, type RelayEvent} from '../events/index.js';
 import {LineBuffer} from '../input/index.js';
 import {ParserPipeline} from '../parsers/index.js';
+import {prepareCommand} from './resolve-command.js';
 
 export interface RunCommandOptions {
   cwd?: string;
@@ -42,21 +43,15 @@ export const runCommand = (
   command: readonly string[],
   options: RunCommandOptions,
 ): RunningCommand => {
-  const [executable, ...args] = command;
-  if (executable === undefined) {
-    throw new Error('A command is required.');
-  }
-
   const displayCommand = formatCommand(command);
+  const prepared = prepareCommand(command);
   options.onEvent(processEvent('starting', displayCommand));
 
-  const child = spawn(executable, args, {
+  const child = spawn(prepared.executable, prepared.arguments, {
     cwd: options.cwd,
     env: options.env,
-    shell:
-      process.platform === 'win32' &&
-      !executable.toLowerCase().endsWith('.exe') &&
-      !executable.toLowerCase().endsWith('.com'),
+    shell: false,
+    windowsVerbatimArguments: prepared.windowsVerbatimArguments ?? false,
     windowsHide: true,
     stdio: ['pipe', 'pipe', 'pipe'],
   });

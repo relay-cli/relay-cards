@@ -67,6 +67,10 @@ export const runCommand = (
     parser: ParserPipeline,
   ): void => {
     for (const line of lines) {
+      const otherParser = stream === 'stdout' ? stderrParser : stdoutParser;
+      for (const event of otherParser.flush()) {
+        options.onEvent(event);
+      }
       for (const event of parser.push(line, stream)) {
         options.onEvent(event);
       }

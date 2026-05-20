@@ -18,6 +18,12 @@ describe('runCommand', () => {
     expect(
       events.some((event) => event.kind === 'warning' && event.message === 'fixture warning'),
     ).toBe(true);
+    const errorIndex = events.findIndex((event) => event.kind === 'error');
+    const followingTextIndex = events.findIndex(
+      (event) => event.kind === 'text' && event.raw === 'after error',
+    );
+    expect(errorIndex).toBeGreaterThan(-1);
+    expect(followingTextIndex).toBeGreaterThan(errorIndex);
     expect(events.at(0)).toMatchObject({kind: 'process', state: 'starting'});
     expect(events.at(-1)).toMatchObject({kind: 'process', state: 'exited', exitCode: 7});
   });

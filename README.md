@@ -43,19 +43,19 @@ When input or output is redirected, Relay Cards writes plain lines without inter
 
 ## Controls
 
-| Key | Action |
-| --- | --- |
-| `↑`, `k` | Select the previous event |
-| `↓`, `j` | Select the next event |
-| `g`, `G` | Jump to the first event or follow the latest one |
-| `Enter` | Expand or collapse the selected card |
-| `1`–`6` | Toggle HTTP, JSON, error, warning, process, and text events |
-| `/` | Filter the visible feed by text |
-| `r` | Switch between cards and raw output |
-| `p` | Pause or resume the visible feed |
-| `c` | Clear event history |
-| `q` | Stop the child command and exit |
-| `?` | Open the keyboard reference |
+| Key      | Action                                                      |
+| -------- | ----------------------------------------------------------- |
+| `↑`, `k` | Select the previous event                                   |
+| `↓`, `j` | Select the next event                                       |
+| `g`, `G` | Jump to the first event or follow the latest one            |
+| `Enter`  | Expand or collapse the selected card                        |
+| `1`–`6`  | Toggle HTTP, JSON, error, warning, process, and text events |
+| `/`      | Filter the visible feed by text                             |
+| `r`      | Switch between cards and raw output                         |
+| `p`      | Pause or resume the visible feed                            |
+| `c`      | Clear event history                                         |
+| `q`      | Stop the child command and exit                             |
+| `?`      | Open the keyboard reference                                 |
 
 ## Recognized output
 

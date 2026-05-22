@@ -1,6 +1,6 @@
 name: Bug report
 description: Report incorrect parsing, rendering, or process behavior.
-title: "bug: "
+title: 'bug: '
 labels: [bug]
 body:
   - type: textarea

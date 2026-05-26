@@ -3,6 +3,7 @@ import {createEventBase, type ProcessEvent, type RelayEvent} from '../events/ind
 import {LineBuffer} from '../input/index.js';
 import {ParserPipeline} from '../parsers/index.js';
 import {prepareCommand} from './resolve-command.js';
+import {terminateProcess} from './signals.js';
 
 export interface RunCommandOptions {
   cwd?: string;
@@ -115,7 +116,7 @@ export const runCommand = (
       return false;
     }
     options.onEvent(processEvent('stopping', displayCommand, {signal}));
-    return child.kill(signal);
+    return terminateProcess(child, signal);
   };
 
   return {child, completion, displayCommand, stop};

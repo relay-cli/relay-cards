@@ -20,14 +20,14 @@ export const RawFeed = ({events, visibleCount = 16}: RawFeedProps) => {
   return (
     <Box flexDirection="column">
       {visible.map((event) => (
-        <Box key={event.id} gap={1}>
-          <Text color={theme.muted}>{formatTimestamp(event.timestamp)}</Text>
+        <Text key={event.id} color={theme.text} wrap="wrap">
+          <Text color={theme.muted}>{formatTimestamp(event.timestamp)} </Text>
           <Text color={event.stream === 'stderr' ? theme.orange : theme.blue}>
-            [{event.stream}]
+            [{event.stream}]{' '}
           </Text>
-          <Text color={theme.text}>{event.raw === '' ? ' ' : event.raw}</Text>
-          {event.repeat > 1 && <Text color={theme.muted}>×{event.repeat}</Text>}
-        </Box>
+          {event.raw === '' ? ' ' : event.raw}
+          {event.repeat > 1 && <Text color={theme.muted}> ×{event.repeat}</Text>}
+        </Text>
       ))}
     </Box>
   );

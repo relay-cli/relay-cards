@@ -4,6 +4,7 @@ import type {RelayEvent} from '../src/events/index.js';
 import {runCommand} from '../src/process/index.js';
 
 const fixture = fileURLToPath(new URL('./fixtures/emitter.mjs', import.meta.url));
+const sleeper = fileURLToPath(new URL('./fixtures/sleeper.mjs', import.meta.url));
 
 describe('runCommand', () => {
   it('emits parsed output and preserves the exit code', async () => {
@@ -26,5 +27,19 @@ describe('runCommand', () => {
     expect(followingTextIndex).toBeGreaterThan(errorIndex);
     expect(events.at(0)).toMatchObject({kind: 'process', state: 'starting'});
     expect(events.at(-1)).toMatchObject({kind: 'process', state: 'exited', exitCode: 7});
+  });
+
+  it('stops a running process tree', async () => {
+    const running = runCommand([process.execPath, sleeper], {onEvent: () => {}});
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(running.stop()).toBe(true);
+
+    const result = await Promise.race([
+      running.completion,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Process did not stop.')), 3000),
+      ),
+    ]);
+    expect(result.exitCode !== null || result.signal !== null).toBe(true);
   });
 });

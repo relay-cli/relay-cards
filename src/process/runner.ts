@@ -21,6 +21,7 @@ export interface RunningCommand {
   completion: Promise<CommandResult>;
   displayCommand: string;
   stop: (signal?: NodeJS.Signals) => boolean;
+  detach: () => void;
 }
 
 const quoteArgument = (value: string): string => (/\s/.test(value) ? JSON.stringify(value) : value);
@@ -119,5 +120,12 @@ export const runCommand = (
     return terminateProcess(child, signal);
   };
 
-  return {child, completion, displayCommand, stop};
+  const detach = (): void => {
+    child.stdin.destroy();
+    child.stdout.destroy();
+    child.stderr.destroy();
+    child.unref();
+  };
+
+  return {child, completion, displayCommand, stop, detach};
 };

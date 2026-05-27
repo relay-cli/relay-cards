@@ -94,7 +94,7 @@ Malformed structured output becomes a text event. It is never silently discarded
 -v, --version      Show the version
 ```
 
-Consecutive identical events are grouped for one second by default. The history limit prevents a long-running process from growing memory use without a bound.
+The interactive feed groups consecutive identical events for one second by default. The history limit prevents a long-running process from growing memory use without a bound.
 
 ## Use the components
 

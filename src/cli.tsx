@@ -50,6 +50,10 @@ const run = async (): Promise<void> => {
 
   const commandLabel = formatCommand(options.command);
   let app: Instance | undefined;
+  let requestQuit: (() => void) | undefined;
+  const quitRequested = new Promise<void>((resolve) => {
+    requestQuit = resolve;
+  });
   const running = runCommand(options.command, {onEvent});
   const removeSignalForwarding = forwardProcessSignals(running.child);
 
@@ -58,15 +62,29 @@ const run = async (): Promise<void> => {
       <RelayCardsApp
         store={store}
         commandLabel={commandLabel}
-        onQuit={() => running.stop('SIGTERM')}
+        onQuit={() => {
+          running.stop('SIGTERM');
+          app?.unmount();
+          requestQuit?.();
+        }}
       />,
       {exitOnCtrlC: false},
     );
   }
 
-  const result = await running.completion;
+  const result = await Promise.race([
+    running.completion,
+    quitRequested.then(
+      () => new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 1500)),
+    ),
+  ]);
   removeSignalForwarding();
   app?.unmount();
+  if (result === undefined) {
+    running.detach();
+    process.exitCode = 130;
+    return;
+  }
   process.exitCode = result.exitCode ?? (result.signal === null ? 1 : 128);
 };
 

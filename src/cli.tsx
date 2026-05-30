@@ -50,6 +50,7 @@ const run = async (): Promise<void> => {
 
   const commandLabel = formatCommand(options.command);
   let app: Instance | undefined;
+  let quitRequestedByUser = false;
   let requestQuit: (() => void) | undefined;
   const quitRequested = new Promise<void>((resolve) => {
     requestQuit = resolve;
@@ -63,6 +64,7 @@ const run = async (): Promise<void> => {
         store={store}
         commandLabel={commandLabel}
         onQuit={() => {
+          quitRequestedByUser = true;
           running.stop('SIGTERM');
           app?.unmount();
           requestQuit?.();
@@ -82,7 +84,11 @@ const run = async (): Promise<void> => {
   app?.unmount();
   if (result === undefined) {
     running.detach();
-    process.exitCode = 130;
+    process.exitCode = 0;
+    return;
+  }
+  if (quitRequestedByUser) {
+    process.exitCode = 0;
     return;
   }
   process.exitCode = result.exitCode ?? (result.signal === null ? 1 : 128);

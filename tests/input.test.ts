@@ -9,6 +9,14 @@ describe('LineBuffer', () => {
     expect(buffer.flush()).toEqual(['three']);
   });
 
+  it('keeps multibyte characters that are split across chunks', () => {
+    const buffer = new LineBuffer();
+    const bytes = Buffer.from('café ✓\n', 'utf8');
+    expect(buffer.push(bytes.subarray(0, 4))).toEqual([]);
+    expect(buffer.push(bytes.subarray(4, 7))).toEqual([]);
+    expect(buffer.push(bytes.subarray(7))).toEqual(['café ✓']);
+  });
+
   it('does not invent a line when the buffer is empty', () => {
     expect(new LineBuffer().flush()).toEqual([]);
   });

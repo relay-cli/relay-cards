@@ -14,12 +14,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/relay-cli/server-cards.git"
+    "url": "git+https://github.com/relay-cli/relay-cards.git"
   },
   "bugs": {
-    "url": "https://github.com/relay-cli/server-cards/issues"
+    "url": "https://github.com/relay-cli/relay-cards/issues"
   },
-  "homepage": "https://github.com/relay-cli/server-cards#readme",
+  "homepage": "https://github.com/relay-cli/relay-cards#readme",
   "publishConfig": {
     "access": "public"
   },
